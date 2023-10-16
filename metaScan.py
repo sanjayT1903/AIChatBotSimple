@@ -1,4 +1,4 @@
-from transformers import MarkupLMFeatureExtractor, MarkupLMProcessor
+
 from bs4.element import Comment
 from bs4 import BeautifulSoup
 
