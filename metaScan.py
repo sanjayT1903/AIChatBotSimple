@@ -1,4 +1,6 @@
-
+import streamlit as st
+import os
+from transformers import MarkupLMFeatureExtractor, MarkupLMProcessor
 from bs4.element import Comment
 from bs4 import BeautifulSoup
 
@@ -59,66 +61,74 @@ def aiHelper(inputer):
     print(response.result)
     return response.result
 
-page_name_1 = "post_comments_1.html"
+def parser(inputs):
+    page_name_1 = inputs
 
-with open(page_name_1) as f:
-    single_html_string = f.read()
+    with open(page_name_1) as f:
+        single_html_string = f.read()
 
-# The provided HTML string
-html_segment = single_html_string
+    # The provided HTML string
+    html_segment = single_html_string
 
-# Parse the HTML segment using BeautifulSoup
-soup = BeautifulSoup(html_segment, 'html.parser')
+    # Parse the HTML segment using BeautifulSoup
+    soup = BeautifulSoup(html_segment, 'html.parser')
 
-# Find all the elements with class "_2pin _a6_q" (or use other suitable class)
-elements = soup.find_all('td', class_='_2pin _a6_q')
+    # Find all the elements with class "_2pin _a6_q" (or use other suitable class)
+    elements = soup.find_all('td', class_='_2pin _a6_q')
 
-# Extract the comment values and store them in an array
-comment_values = []
-for element in elements:
-    comment = element.find('div').text
-    comment_values.append(comment)
-i = 0
-string = ""
-bad_values = []
+    # Extract the comment values and store them in an array
+    comment_values = []
+    for element in elements:
+        comment = element.find('div').text
+        comment_values.append(comment)
+    i = 0
+    string = ""
+    bad_values = []
 
-badWords_list = ["gay", "terrorism"] #need to add more
+    my_list = ["gay", "terrorism"]
 
 
 
-# Print the comment values in an array
-for value in comment_values:
-    if value.find("PM") != -1 or value.find("AM") != -1:
-        if i ==1:
-            i=0
-            bad_values.append(string + " -> " + value)
+    # Print the comment values in an array
+    for value in comment_values:
+        if value.find("PM") != -1 or value.find("AM") != -1:
+            if i ==1:
+                i=0
+                bad_values.append(string + " -> " + value)
+                #print(value)
+        else:
             #print(value)
-    else:
-        #print(value)
-        holder =""
-        if any(value.lower() in item for item in badWords_list):
-            holder2 = aiHelper(value)
-            #print(str(holder) )
-            charVal2 = str(holder2)[0]
-            #print(charVal)
-            intVal2 = int(charVal2)
-            #print(intVal)
-            if intVal2>=6:
-                string = value
-                i = 1
-        elif value.count(" ") >0: #change gay wth array of derogatory words
-            holder = aiHelper(value)
-            #print(str(holder) )
-            charVal = str(holder)[0]
-            #print(charVal)
-            intVal = int(charVal)
-            if charVal==1 and  str(holder)[0] == 0:
-                intVal = 10
-            #print(intVal)
-            if intVal>=6:
-                string = value
-                i = 1
-        
-print("---------------------------------------" + "\n")
-for element in bad_values:
-    print(element)
+            holder =""
+            if any(value.lower() in item for item in my_list):
+                holder2 = aiHelper(value)
+                #print(str(holder) )
+                charVal2 = str(holder2)[0]
+                #print(charVal)
+                intVal2 = int(charVal2)
+                #print(intVal)
+                if intVal2>=6:
+                    string = value
+                    i = 1
+            elif value.count(" ") >0: #change gay wth array of derogatory words
+                holder = aiHelper(value)
+                #print(str(holder) )
+                charVal = str(holder)[0]
+                #print(charVal)
+                intVal = int(charVal)
+                if charVal==1 and  str(holder)[0] == 0:
+                    intVal = 10
+                #print(intVal)
+                if intVal>=6:
+                    string = value
+                    i = 1
+            
+    print("---------------------------------------" + "\n")
+    for element in bad_values:
+        print(element)
+
+filename = st.text_input('Enter a file path:')
+try:
+    with open(filename) as input:
+        parser(st.text(input.read()))
+except FileNotFoundError:
+    st.error('File not found.')
