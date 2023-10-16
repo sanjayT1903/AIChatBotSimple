@@ -82,7 +82,7 @@ i = 0
 string = ""
 bad_values = []
 
-my_list = ["gay", "terrorism"] #need to add more
+badWords_list = ["gay", "terrorism"] #need to add more
 
 
 
@@ -96,7 +96,7 @@ for value in comment_values:
     else:
         #print(value)
         holder =""
-        if any(value.lower() in item for item in my_list):
+        if any(value.lower() in item for item in badWords_list):
             holder2 = aiHelper(value)
             #print(str(holder) )
             charVal2 = str(holder2)[0]
